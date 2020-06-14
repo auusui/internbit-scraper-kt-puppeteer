@@ -1,0 +1,23 @@
+{
+  "name": "internbit-scraper-kt-puppeteer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "linked": "node linkedintest",
+    "soc": "node soc",
+    "idea": "node idealist"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/radgrad/internbit-scraper-kt-puppeteer.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/radgrad/internbit-scraper-kt-puppeteer/issues"
+  },
+  "homepage": "https://github.com/radgrad/internbit-scraper-kt-puppeteer#readme"
+}
