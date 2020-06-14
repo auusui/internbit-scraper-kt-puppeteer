@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/radgrad/internbit-scraper-kt-puppeteer/issues"
   },
-  "homepage": "https://github.com/radgrad/internbit-scraper-kt-puppeteer#readme"
+  "homepage": "https://github.com/radgrad/internbit-scraper-kt-puppeteer#readme",
+  "dependencies": {
+    "puppeteer": "^3.3.0"
+  }
 }
