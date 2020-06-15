@@ -1,9 +1,23 @@
-const puppeteer = require('puppeteer');
+const puppeteer = require('puppeteer-extra');
 const USERNAME_SELECTOR = '#mat-input-0';
 const PASSWORD_SELECTOR = '#mat-input-1';
 const CTA_SELECTOR = '#login-submit-button';
+const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 
 const credentials = process.argv.slice(2);
+const userAgent = require('user-agents');
+
+async function fetchInfo(page, selector) {
+  let result = '';
+  try {
+    await page.waitForSelector(selector);
+    result = await page.evaluate((select) => document.querySelector(select).textContent, selector);
+  } catch (error) {
+    console.log('Our Error: fetchInfo() failed.\n', error.message);
+    result = 'Error';
+  }
+  return result;
+}
 
 async function startBrowser() {
   const browser = await puppeteer.launch({
@@ -23,24 +37,25 @@ async function login(url, browser, page) {
   await page.goto(url);
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type(credentials[0]);
+  await page.waitFor(20000)
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type(credentials[1]);
+  await page.waitFor(20000)
   await page.click(CTA_SELECTOR);
 }
 
 async function input(page) {
-  await page.waitFor(60000);
-  await page.waitForSelector('#container-1 > core-sidebar > navbar > navbar-vertical-style-2 > div.navbar-content.fuse-navy-700.ps > core-navigation > div > div > div:nth-child(1) > core-nav-vertical-item:nth-child(2) > a', {
+  await page.waitForSelector('#mat-input-2', {
     timeout: 100000
   });
-  await page.click('#container-1 > core-sidebar > navbar > navbar-vertical-style-2 > div.navbar-content.fuse-navy-700.ps > core-navigation > div > div > div:nth-child(1) > core-nav-vertical-item:nth-child(2) > a');
-  await page.waitForSelector('#mat-input-8');
-  await page.$eval('#mat-input-8', (el, text) => el.value = text, 'computer science');
+  await page.click('#mat-input-2');
+  await page.keyboard.type('computer science');
   await page.screenshot({path: 'soc.png'});
 }
 
 (async () => {
+  puppeteer.use(StealthPlugin())
   const {browser, page} = await startBrowser();
-  await login("https://app.studentopportunitycenter.com/auth/login", browser, page);
+  await login("https://app.studentopportunitycenter.com/app/search", browser, page);
   await input(page);
 })();
