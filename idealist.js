@@ -1,6 +1,8 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
 
+const searchQuery = process.argv.slice(2);
+
 async function fetchInfo(page, selector) {
   let result = '';
   try {
@@ -65,7 +67,13 @@ async function getData(page, elements) {
         console.log(element);
         await page.goto(element, { waitUntil: 'domcontentloaded' });
         const position = await fetchInfo(page, '[data-qa-id=listing-name]');
-        const company = await fetchInfo(page, '[data-qa-id=org-link]');
+        let company = '';
+        try {
+          company = await fetchInfo(page, '[data-qa-id=org-link]');
+        } catch(e) {
+          console.log('No company found. Setting to N/A');
+          company = 'N/A';
+        }
         const description = await fetchInfo(page, '.Text-sc-1wv914u-0.dlxdi.idlst-rchtxt.Text__StyledRichText-sc-1wv914u-1.ctyuXi');
         console.log(position);
         data.push({
@@ -92,43 +100,9 @@ async function getData(page, elements) {
 
     await page.goto('https://www.idealist.org/en/');
     await page.waitForSelector('#layout-root > div.idlst-flx.Box__BaseBox-sc-1wooqli-0.lnKqQM > div.idlst-flx.Box__BaseBox-sc-1wooqli-0.dCQmbn.BaseLayout__PageContent-sc-10xtgtb-2.heQjSt > div.Box__BaseBox-sc-1wooqli-0.bsSECh > div > div.Box__BaseBox-sc-1wooqli-0.hpEILX > div.Box__BaseBox-sc-1wooqli-0.datyjK > div > div > div.idlst-flx.idlst-lgncntr.Box__BaseBox-sc-1wooqli-0.cDmdoN > div > form > div.Box__BaseBox-sc-1wooqli-0.ejycyy > div > input');
-    await page.type('input[data-qa-id="search-input"]', 'computer science');
+    await page.type('input[data-qa-id="search-input"]', searchQuery);
     await page.click('button[data-qa-id="search-button"]');
     await page.waitForSelector('#results > div > div > div.Box__BaseBox-sc-1wooqli-0.iuHlOF > div:nth-child(2) > div > div > div > div.Box__BaseBox-sc-1wooqli-0.csFszx > div.Box__BaseBox-sc-1wooqli-0.iKEEgc > h4 > a');
-
-    //let hasNext = true;
-
-    //let elements = [];
-/*
-    while (hasNext == true) {
-      try {
-        await page.waitFor(1000);
-        elements.push(await page.evaluate(
-            () =>
-                // eslint-disable-next-line no-undef
-                document.querySelectorAll('[data-qa-id=search-result-link]'),
-                a => a.getAttribute('href'),
-        ));
-        nextPage = await page.$('[data-qa-id=pagination-link-next]');
-        await nextPage.click();
-      } catch(e) {
-        console.log(elements);
-        hasNext = false;
-        console.log('\nReached the end of pages!');
-      }
-    }
-
- */
-/*
-    elements = await page.evaluate(
-        () => Array.from(
-          // eslint-disable-next-line no-undef
-          document.querySelectorAll('[data-qa-id=search-result-link]'),
-              a => a.getAttribute('href'),
-        ),
-    );
-    console.log(elements);
-    */
 
     await getElements(page).then((elements) => {
       getData(page, elements).then((data => {
@@ -136,25 +110,6 @@ async function getData(page, elements) {
         writeData(data);
       }))
     })
-
-    // await browser.close();
-/*
-    for (let i = 0; i < elements.length; i++) {
-      const element = 'https://www.idealist.org' + elements[i];
-      console.log(element);
-      await page.goto(element, { waitUntil: 'domcontentloaded' });
-      const position = await fetchInfo(page, '[data-qa-id=listing-name]');
-      const company = await fetchInfo(page, '[data-qa-id=org-link]');
-      const description = await fetchInfo(page, '.Text-sc-1wv914u-0.dlxdi.idlst-rchtxt.Text__StyledRichText-sc-1wv914u-1.ctyuXi');
-      console.log(position);
-      data.push({
-        position: position,
-        company: company,
-        description: description,
-        currentURL: element,
-      })
-    }
- */
 
   } catch(e) {
     console.log(e);

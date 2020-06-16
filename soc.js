@@ -71,7 +71,7 @@ async function input(page) {
     timeout: 100000
   });
   await page.click('input[aria-label="Search Bar"]');
-  await page.$eval('input[aria-label="Search Bar"]', (el) => el.value = 'computer science hawaii');
+  await page.$eval('input[aria-label="Search Bar"]', (el) => el.value = 'computer science canada');
   await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
   await page.screenshot({path: 'soc.png'});
 }
