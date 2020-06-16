@@ -11,19 +11,6 @@ const userAgent = require('user-agents');
 async function fetchInfo(page, selector) {
   let result = '';
   try {
-
-    await page.waitForSelector(selector);
-    result = await page.evaluate((select) => document.querySelector(select).textContent, selector);
-  } catch (error) {
-    console.log('Our Error: fetchInfo() failed.\n', error.message);
-    result = 'Error';
-  }
-  return result;
-}
-
-async function fetchInfo(page, selector) {
-  let result = '';
-  try {
     await page.waitForSelector(selector);
     result = await page.evaluate((select) => document.querySelector(select).textContent, selector);
   } catch (error) {
@@ -41,6 +28,7 @@ async function getLinks(page) {
           a => a.getAttribute('href'),
       ),
   );
+  console.log('inside links:' + links);
   return links;
 }
 
@@ -95,7 +83,7 @@ async function getData(page, elements) {
         const element = 'https://app.studentopportunitycenter.com/' + elements[i];
         console.log(element);
         await page.goto(element);
-        const position = await fetchInfo(page, 'span[_ngcontent-c62]');
+        const position = await fetchInfo(page, 'span[class="opportunity-heading pr-6 open-sans ng-tns-c31-3 ng-star-inserted"]');
         const description = await fetchInfo(page, 'span[class="pb-8 mat-body-1 wrap-text"]');
         console.log(position);
         data.push({
