@@ -5,7 +5,9 @@ const PASSWORD_SELECTOR = 'input[aria-label="password"]';
 const CTA_SELECTOR = '#login-submit-button';
 const StealthPlugin = require('puppeteer-extra-plugin-stealth')
 
-const credentials = process.argv.slice(2);
+const commandLine = process.argv.slice(2);
+const credentials = commandLine.slice(0,2);
+console.log(credentials);
 const userAgent = require('user-agents');
 
 async function fetchInfo(page, selector) {
@@ -18,6 +20,30 @@ async function fetchInfo(page, selector) {
     result = 'Error';
   }
   return result;
+}
+
+async function getElements(page) {
+  let hasNext = true;
+  const elements = [];
+  while (hasNext == true) {
+    try {
+      await page.waitFor(1000);
+      getLinks(page).then(links => {
+        elements.push(links);
+      })
+      await page.waitForSelector('button[class="mat-paginator-navigation-next mat-icon-button"]:enabled');
+      nextPage = await page.$('button[class="mat-paginator-navigation-next mat-icon-button"]:enabled');
+      await nextPage.click();
+      //console.log(elements);
+    } catch(e) {
+      console.log(e.message);
+      console.log(elements);
+      hasNext = false;
+      console.log('\nReached the end of pages!');
+    }
+  }
+  console.log(elements);
+  return elements;
 }
 
 async function getLinks(page) {
@@ -52,7 +78,7 @@ async function closeBrowser(browser) {
 }
 
 async function login(url, browser, page) {
-  page.setViewport({width: 1366, height: 768});
+  page.setViewport({width: 800, height: 600});
   await page.setUserAgent('5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36');
   await page.goto(url);
   await page.waitForSelector(USERNAME_SELECTOR);
@@ -70,8 +96,12 @@ async function input(page) {
   await page.waitForSelector('input[aria-label="Search Bar"]', {
     timeout: 100000
   });
+  // let searchQuery = commandLine.slice(2);
+  // searchQuery = searchQuery.join(' ');
+  // console.log('Search query:' + searchQuery);
   await page.click('input[aria-label="Search Bar"]');
   await page.$eval('input[aria-label="Search Bar"]', (el) => el.value = 'computer science canada');
+  await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
   await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
   await page.screenshot({path: 'soc.png'});
 }
@@ -80,10 +110,17 @@ async function getData(page, elements) {
   try {
     const data = [];
     for (let i = 0; i < elements.length; i++) {
-        const element = 'https://app.studentopportunitycenter.com/' + elements[i];
+      for (let j = 0; j < elements[i].length; j++) {
+        const element = 'https://app.studentopportunitycenter.com' + elements[i][j];
         console.log(element);
         await page.goto(element);
-        const position = await fetchInfo(page, 'span[class="opportunity-heading pr-6 open-sans ng-tns-c31-3 ng-star-inserted"]');
+        let position = '';
+        try {
+          position = await fetchInfo(page, 'span[_ngcontent-c31]');
+        } catch (e) {
+          console.log('Can\'t find position, setting to N/A');
+          position = 'N/A';
+        }
         const description = await fetchInfo(page, 'span[class="pb-8 mat-body-1 wrap-text"]');
         console.log(position);
         data.push({
@@ -91,6 +128,7 @@ async function getData(page, elements) {
           description: description,
           currentURL: element,
         })
+      }
     }
     return data;
   } catch(e) {
@@ -103,11 +141,10 @@ async function getData(page, elements) {
   const {browser, page} = await startBrowser();
   await login("https://app.studentopportunitycenter.com/app/search", browser, page);
   await input(page);
-  await getLinks(page).then((links => {
-    console.log(links);
-    getData(page, links).then((data => {
+  await getElements(page).then((elements) => {
+    getData(page, elements).then((data => {
       console.log(data);
       writeData(data);
     }))
-  }))
+  })
 })();
