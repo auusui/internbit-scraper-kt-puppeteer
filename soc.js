@@ -31,7 +31,9 @@ async function getElements(page) {
       getLinks(page).then(links => {
         elements.push(links);
       })
-      await page.waitForSelector('button[class="mat-paginator-navigation-next mat-icon-button"]:enabled');
+      await page.waitForSelector('button[class="mat-paginator-navigation-next mat-icon-button"]:enabled', {
+        timeout: 100000,
+      });
       nextPage = await page.$('button[class="mat-paginator-navigation-next mat-icon-button"]:enabled');
       await nextPage.click();
       //console.log(elements);
@@ -85,7 +87,6 @@ async function login(url, browser, page) {
   await page.waitForSelector(PASSWORD_SELECTOR);
   await page.click(USERNAME_SELECTOR);
   await page.keyboard.type(credentials[0]);
-  await page.waitFor(20000)
   await page.click(PASSWORD_SELECTOR);
   await page.keyboard.type(credentials[1]);
   await page.waitFor(20000)
@@ -99,9 +100,15 @@ async function input(page) {
   // let searchQuery = commandLine.slice(2);
   // searchQuery = searchQuery.join(' ');
   // console.log('Search query:' + searchQuery);
+  /*
+  await page.click('input[aria-label="Search Bar"]');
+  await page.$eval('input[aria-label="Search Bar"]', (el) => el.value = 'computer science');
+  await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
   await page.click('input[aria-label="Search Bar"]');
   await page.$eval('input[aria-label="Search Bar"]', (el) => el.value = 'computer science canada');
-  await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
+   */
+  await page.click('input[aria-label="Search Bar"]');
+  await page.keyboard.type('computer science canada');
   await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
   await page.screenshot({path: 'soc.png'});
 }
@@ -140,11 +147,12 @@ async function getData(page, elements) {
   puppeteer.use(StealthPlugin())
   const {browser, page} = await startBrowser();
   await login("https://app.studentopportunitycenter.com/app/search", browser, page);
-  await input(page);
-  await getElements(page).then((elements) => {
+  await input(page).then(
+  getElements(page).then((elements) => {
     getData(page, elements).then((data => {
       console.log(data);
       writeData(data);
-    }))
-  })
+    }));
+  }),
+  );
 })();
