@@ -28,6 +28,9 @@ async function fetchInfo(page, selector) {
 }
 
 async function getLinks(page) {
+  await page.waitForSelector('a[_ngcontent-c42]', {
+    timeout: 100000,
+  });
   const links = await page.evaluate(
       () => Array.from(
           // eslint-disable-next-line no-undef
@@ -111,16 +114,6 @@ async function input(page) {
   await page.waitForSelector('input[aria-label="Search Bar"]', {
     timeout: 100000,
   });
-  // let searchQuery = commandLine.slice(2);
-  // searchQuery = searchQuery.join(' ');
-  // console.log('Search query:' + searchQuery);
-  /*
-  await page.click('input[aria-label="Search Bar"]');
-  await page.$eval('input[aria-label="Search Bar"]', (el) => el.value = 'computer science');
-  await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
-  await page.click('input[aria-label="Search Bar"]');
-  await page.$eval('input[aria-label="Search Bar"]', (el) => el.value = 'computer science canada');
-   */
   await page.click('input[aria-label="Search Bar"]');
   await page.keyboard.type('computer science canada');
   await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
