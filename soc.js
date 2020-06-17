@@ -10,6 +10,10 @@ const commandLine = process.argv.slice(2);
 const credentials = commandLine.slice(0, 2);
 // eslint-disable-next-line no-console
 console.log(credentials);
+let searchQuery = commandLine.slice(2);
+searchQuery = searchQuery.join(' ');
+// eslint-disable-next-line no-console
+console.log(searchQuery);
 // eslint-disable-next-line no-unused-vars
 const userAgent = require('user-agents');
 
@@ -96,7 +100,7 @@ async function startBrowser() {
 }
 
 async function login(url, browser, page) {
-  page.setViewport({ width: 800, height: 600 });
+  page.setViewport({ width: 700, height: 500 });
   // eslint-disable-next-line max-len
   await page.setUserAgent('5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36');
   await page.goto(url);
@@ -115,7 +119,7 @@ async function input(page) {
     timeout: 100000,
   });
   await page.click('input[aria-label="Search Bar"]');
-  await page.keyboard.type('computer science canada');
+  await page.keyboard.type(searchQuery);
   await (await page.$('input[aria-label="Search Bar"]')).press('Enter');
   await page.screenshot({ path: 'soc.png' });
 }
