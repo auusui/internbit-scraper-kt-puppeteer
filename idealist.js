@@ -93,6 +93,24 @@ async function getData(page, elements) {
           console.log('No company found. Setting to N/A');
           company = 'N/A';
         }
+        let startDate = '';
+        try {
+          // eslint-disable-next-line max-len,no-await-in-loop
+          startDate = await fetchInfo(page, 'div[class="Text-sc-1wv914u-0 ipQFfx ListingPage__SidebarValue-sc-1k7j7cc-3 fmxJEJ"]');
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log('No startDate found. Setting to N/A');
+          startDate = 'N/A';
+        }
+        let location = '';
+        try {
+          // eslint-disable-next-line no-await-in-loop
+          location = await fetchInfo(page, 'div[class="Text-sc-1wv914u-0 kkIWaE"]');
+        } catch (e) {
+          // eslint-disable-next-line no-console
+          console.log('No location found. Setting to N/A');
+          location = 'N/A';
+        }
         // eslint-disable-next-line no-await-in-loop,max-len
         const description = await fetchInfo(page, '.Text-sc-1wv914u-0.dlxdi.idlst-rchtxt.Text__StyledRichText-sc-1wv914u-1.ctyuXi');
         // eslint-disable-next-line no-console
@@ -100,6 +118,8 @@ async function getData(page, elements) {
         data.push({
           position: position,
           company: company,
+          startDate: startDate,
+          location: location,
           description: description,
           currentURL: element,
         });
@@ -114,9 +134,7 @@ async function getData(page, elements) {
 
 (async () => {
   try {
-    const browser = await puppeteer.launch({
-      headless: false,
-    });
+    const browser = await puppeteer.launch();
     const page = await browser.newPage();
     // eslint-disable-next-line max-len
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.97 Safari/537.36');
