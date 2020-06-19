@@ -6,6 +6,10 @@ To install puppeteer for this repo, cd into the internbit-scraper-kt-osmosis dir
 ```
 npm install puppeteer
 ```
+Also make sure that you install moment.js for this repo by running:
+```
+npm install moment --save 
+```
 
 ## Running the scripts / Testing
 For the Idealist script, in the internbit-scraper-kt-puppeteer directory, run:
