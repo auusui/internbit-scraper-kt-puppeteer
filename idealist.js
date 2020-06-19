@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const moment = require('moment');
 
 const searchQuery = process.argv.slice(2);
 
@@ -19,7 +20,7 @@ async function fetchInfo(page, selector) {
 }
 
 async function writeData(data) {
-  await fs.writeFile('./idealist.data.json',
+  await fs.writeFile('./idealist.canonical.data.json',
       JSON.stringify(data, null, 4), 'utf-8',
       // eslint-disable-next-line no-console
       err => (err ? console.log('\nData not written!', err) :
@@ -93,14 +94,14 @@ async function getData(page, elements) {
           console.log('No company found. Setting to N/A');
           company = 'N/A';
         }
-        let startDate = '';
+        let posted = '';
         try {
           // eslint-disable-next-line max-len,no-await-in-loop
-          startDate = await fetchInfo(page, 'div[class="Text-sc-1wv914u-0 ipQFfx ListingPage__SidebarValue-sc-1k7j7cc-3 fmxJEJ"]');
+          posted = await fetchInfo(page, 'div[class="Text-sc-1wv914u-0 dbgeCi"]');
         } catch (e) {
           // eslint-disable-next-line no-console
           console.log('No startDate found. Setting to N/A');
-          startDate = 'N/A';
+          posted = 'N/A';
         }
         let location = '';
         try {
@@ -111,6 +112,9 @@ async function getData(page, elements) {
           console.log('No location found. Setting to N/A');
           location = 'N/A';
         }
+        const skills = 'N/A for now';
+        // eslint-disable-next-line no-await-in-loop,max-len
+        const lastScraped = moment().format('MMMM Do YYYY, h:mm:ss a');
         // eslint-disable-next-line no-await-in-loop,max-len
         const description = await fetchInfo(page, '.Text-sc-1wv914u-0.dlxdi.idlst-rchtxt.Text__StyledRichText-sc-1wv914u-1.ctyuXi');
         // eslint-disable-next-line no-console
@@ -118,10 +122,12 @@ async function getData(page, elements) {
         data.push({
           position: position,
           company: company,
-          startDate: startDate,
           location: location,
+          posted: posted,
+          url: element,
+          lastScraped: lastScraped,
+          skills: skills,
           description: description,
-          currentURL: element,
         });
       }
     }
