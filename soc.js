@@ -1,5 +1,6 @@
 const puppeteer = require('puppeteer-extra');
 const fs = require('fs');
+const moment = require('moment');
 
 const USERNAME_SELECTOR = 'input[aria-label="email"]';
 const PASSWORD_SELECTOR = 'input[aria-label="password"]';
@@ -83,7 +84,7 @@ async function getElements(page) {
 }
 
 async function writeData(data) {
-  await fs.writeFile('./soc.data.json',
+  await fs.writeFile('./soc.canonical.data.json',
       JSON.stringify(data, null, 4), 'utf-8',
       // eslint-disable-next-line no-console
       err => (err ? console.log('\nData not written!', err) :
@@ -144,14 +145,24 @@ async function getData(page, elements) {
           console.log('Can\'t find position, setting to N/A');
           position = 'N/A';
         }
+        const company = 'N/A';
+        const location = 'N/A';
+        const posted = 'N/A';
+        const lastScraped = moment().format('MMMM Do YYYY, h:mm:ss a');
+        const skills = 'N/A for now';
         // eslint-disable-next-line no-await-in-loop
         const description = await fetchInfo(page, 'span[class="pb-8 mat-body-1 wrap-text"]');
         // eslint-disable-next-line no-console
         console.log(position);
         data.push({
           position: position,
+          company: company,
+          location: location,
+          posted: posted,
+          url: element,
+          lastScraped: lastScraped,
+          skills: skills,
           description: description,
-          currentURL: element,
         });
       }
     }
