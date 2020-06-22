@@ -8,6 +8,7 @@
     "linked": "node linkedintest",
     "soc": "node soc",
     "idea": "node idealist",
+    "nat": "node naturalTest",
     "scraper": "node idealist computer science && mocha -r esm *.test.js"
   },
   "repository": {
@@ -23,6 +24,7 @@
   "homepage": "https://github.com/radgrad/internbit-scraper-kt-puppeteer#readme",
   "dependencies": {
     "moment": "^2.27.0",
+    "natural": "^2.1.5",
     "puppeteer": "^3.3.0",
     "puppeteer-extra": "^3.1.9",
     "puppeteer-extra-plugin-stealth": "^2.4.9",
