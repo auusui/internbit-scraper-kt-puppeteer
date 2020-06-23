@@ -1,14 +1,15 @@
 const natural = require('natural');
 const fs = require('fs');
 
-const tokenizer = new natural.WordTokenizer();
+// const tokenizer = new natural.WordTokenizer();
 const ideaFile = './idealist.canonical.data.json';
 
 const text = fs.readFileSync(ideaFile).toString('utf-8');
 // eslint-disable-next-line no-eval
 const arr = eval(`[${text}]`);
 console.log(arr[0][1]);
-console.log(tokenizer.tokenize(arr[0][1].description));
+natural.PorterStemmer.attach();
+console.log((arr[0][1].description).tokenizeAndStem());
 /*
 async function read(filename) {
   fs.readFile(filename, 'utf8', function (err, fileContents) {
